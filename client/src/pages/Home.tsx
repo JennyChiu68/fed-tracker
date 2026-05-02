@@ -347,8 +347,8 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
             {/* 底部：历史胜率 + 信号强度条 */}
             <div className="px-3 pb-2.5 flex items-center gap-3">
               <div className="flex items-center gap-3 text-[10px] text-white/35">
-                <span>鹰派周期历史月涂 <span className={asset.hawkishDirection === 1 ? 'text-[#EF5350]' : 'text-[#00BFA5]'} style={{ fontFamily: 'Space Mono' }}>{asset.hawkishMonthlyReturn}</span></span>
-                <span>胜率 <span className="text-[#E8B84B]" style={{ fontFamily: 'Space Mono' }}>{asset.hawkishWinRate}</span></span>
+                <span>鹰派周期历史月均涨跌 <span className={asset.hawkishDirection === 1 ? 'text-[#EF5350]' : 'text-[#00BFA5]'} style={{ fontFamily: 'Space Mono' }}>{asset.hawkishMonthlyReturn}</span></span>
+                <span>历史同向 <span className="text-white/50" style={{ fontFamily: 'Space Mono' }}>{asset.hawkishWinRate}</span></span>
               </div>
               <div className="flex-1 h-1 rounded-full bg-white/5 overflow-hidden">
                 <motion.div
@@ -365,7 +365,7 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
       })}
 
       <div className="text-[10px] text-white/20 pt-1 leading-relaxed">
-        历史胜率基于2015-2026年美联储鹰派周期统计 · 不构成投资建议
+        历史同向概率基于2015-2026年美联储鹰派周期统计 · 仅供参考，不构成任何投资建议
       </div>
     </div>
   );
