@@ -385,84 +385,100 @@ export const hawkishHistory = [
 export interface AssetLiveData {
   asset: string;
   assetZh: string;
-  basePrice: number;       // 中性基准价格
-  currentPrice: number;    // 当前实际价格
+  currentPrice: number;    // fallback参考价
   unit: string;
-  // 每10点鹰鸽指数变化对应的价格变化（鹰派方向）
-  sensitivityPer10: number;
-  // 正值=鹰派利好，负值=鹰派利空
-  hawkishDirection: 1 | -1;
-  precision: number;       // 小数位数
+  precision: number;
   sensitivity: number;     // 1-5 敏感度星级
-  description: string;     // 联动逻辑说明
   color: string;
+  // 鹰派方向：+1=鹰派利好, -1=鹰派利空
+  hawkishDirection: 1 | -1;
+  // 当前鹰鸽指数下，预期方向说明（鹰派场景）
+  hawkishImpact: string;
+  // 鹰派强度每变动10点，对应的影响幅度（带单位）
+  impactPer10: string;
+  // 历史统计：鹰派周期内该资产平均月涂
+  hawkishMonthlyReturn: string;
+  // 鹰派周期内该资产历史胜率
+  hawkishWinRate: string;
+  // 逻辑说明（一句话）
+  logic: string;
 }
 
 export const assetLiveData: AssetLiveData[] = [
   {
     asset: 'XAU/USD',
     assetZh: '现货黄金',
-    basePrice: 3350,
-    currentPrice: 3247,
+    currentPrice: 4626,
     unit: '$',
-    sensitivityPer10: -18,   // 鹰派每+10，黄金约-$18
-    hawkishDirection: -1,
     precision: 0,
     sensitivity: 4,
-    description: '利率上升压制无息资产，鹰派偏移每+10点约-$18',
     color: '#E8B84B',
+    hawkishDirection: -1,
+    hawkishImpact: '承压',
+    impactPer10: '每+10点约-$18',
+    hawkishMonthlyReturn: '-1.8%',
+    hawkishWinRate: '72%',
+    logic: '利率上升压制无息资产，黄金对利率预期极敏感',
   },
   {
     asset: 'DXY',
     assetZh: '美元指数',
-    basePrice: 100.2,
-    currentPrice: 102.4,
+    currentPrice: 98.2,
     unit: '',
-    sensitivityPer10: +0.8,  // 鹰派每+10，美元约+0.8
-    hawkishDirection: 1,
     precision: 1,
     sensitivity: 5,
-    description: '利差扩大支撑美元，鹰派偏移每+10点约+0.8',
     color: '#4DB6AC',
+    hawkishDirection: 1,
+    hawkishImpact: '强势',
+    impactPer10: '每+10点约+0.8',
+    hawkishMonthlyReturn: '+0.8%',
+    hawkishWinRate: '78%',
+    logic: '利差扩大吸引资金回流，美元指数最直接受益',
   },
   {
     asset: 'USD/JPY',
     assetZh: '美元/日元',
-    basePrice: 143.5,
-    currentPrice: 148.2,
-    unit: '¥',
-    sensitivityPer10: +1.7,  // 鹰派每+10，美日约+1.7
-    hawkishDirection: 1,
+    currentPrice: 157.0,
+    unit: '',
     precision: 1,
     sensitivity: 5,
-    description: '美日利差扩大，鹰派偏移每+10点约+1.7',
     color: '#9E9E9E',
+    hawkishDirection: 1,
+    hawkishImpact: '日元承压',
+    impactPer10: '每+10点约+1.7',
+    hawkishMonthlyReturn: '+1.1%',
+    hawkishWinRate: '75%',
+    logic: '美日利差扩大，日元持续承压走弱',
   },
   {
     asset: 'US10Y',
-    assetZh: '10年期美债',
-    basePrice: 3.85,
-    currentPrice: 4.28,
+    assetZh: '10Y美傘收益率',
+    currentPrice: 4.378,
     unit: '%',
-    sensitivityPer10: +0.15, // 鹰派每+10，收益率约+0.15%
-    hawkishDirection: 1,
     precision: 2,
     sensitivity: 5,
-    description: '加息预期推升收益率，鹰派偏移每+10点约+0.15%',
     color: '#EF5350',
+    hawkishDirection: 1,
+    hawkishImpact: '收益率上行',
+    impactPer10: '每+10点约+0.15%',
+    hawkishMonthlyReturn: '+0.12%',
+    hawkishWinRate: '81%',
+    logic: '加息预期直接推升长端傘收益率',
   },
   {
     asset: 'WTI/USD',
     assetZh: 'WTI原油',
-    basePrice: 100.5,
-    currentPrice: 98.6,
+    currentPrice: 102.5,
     unit: '$',
-    sensitivityPer10: -0.8,  // 鹰派每+10，原油约-$0.8（需求担忧）
-    hawkishDirection: -1,
     precision: 1,
     sensitivity: 2,
-    description: '经济放缓预期压制需求，鹰派偏移每+10点约-$0.8',
     color: '#9E9E9E',
+    hawkishDirection: -1,
+    hawkishImpact: '需求承压',
+    impactPer10: '每+10点约-$0.8',
+    hawkishMonthlyReturn: '-0.5%',
+    hawkishWinRate: '58%',
+    logic: '经济放缓预期压制需求，但地缘因素对冲弱',
   },
 ];
 

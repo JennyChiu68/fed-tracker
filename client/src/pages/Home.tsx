@@ -223,13 +223,11 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   );
 }
 
-// ─── Dynamic Asset Panel ──────────────────────────────────────────────────────
-// 核心：接入真实行情 + 根据鹰鸽指数动态计算联动估值
+// 核心：展示实时行情 + 鹰鸽信号对各品种的影响方向
 function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
   const [prevScore, setPrevScore] = useState(hawkScore);
   const [flashAsset, setFlashAsset] = useState<string | null>(null);
 
-  // 接入真实行情，每60秒刷新一次
   const { data: liveData, isLoading: pricesLoading } = trpc.market.prices.useQuery(
     undefined,
     { refetchInterval: 60_000, staleTime: 30_000 }
@@ -244,32 +242,20 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
     }
   }, [hawkScore, prevScore]);
 
-  // 计算联动价格：基准价格 + (鹰鸽指数/10) * 每10点敏感度
-  const calcLinkedPrice = (asset: AssetLiveData) => {
-    const delta = (hawkScore / 10) * asset.sensitivityPer10;
-    return asset.basePrice + delta;
-  };
-
-  // 获取真实当前价（优先用API数据，fallback用静态数据）
   const getLivePrice = (asset: AssetLiveData): number => {
-    const live = liveData?.[asset.asset];
-    return live?.price ?? asset.currentPrice;
+    return liveData?.[asset.asset]?.price ?? asset.currentPrice;
   };
+  const getLiveChange = (asset: AssetLiveData) => ({
+    change: liveData?.[asset.asset]?.change ?? 0,
+    changePct: liveData?.[asset.asset]?.changePct ?? 0,
+  });
 
-  const getLiveChange = (asset: AssetLiveData): { change: number; changePct: number } => {
-    const live = liveData?.[asset.asset];
-    return { change: live?.change ?? 0, changePct: live?.changePct ?? 0 };
-  };
-
-  // 计算当前价格偏离联动价格的幅度
-  const calcDeviation = (asset: AssetLiveData) => {
-    const linked = calcLinkedPrice(asset);
-    const current = getLivePrice(asset);
-    return current - linked;
-  };
+  // 鹰鸽信号强度：当前鹰鸽指数的绝对强度（用于显示影响幅度）
+  const signalStrength = Math.abs(hawkScore);
+  const isHawkish = hawkScore > 0;
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2">
       {pricesLoading && (
         <div className="text-center text-white/30 text-xs py-3 flex items-center justify-center gap-2">
           <div className="w-3 h-3 border border-[#E8B84B]/40 border-t-[#E8B84B] rounded-full animate-spin" />
@@ -279,113 +265,107 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
       {assetLiveData.map((asset) => {
         const livePrice = getLivePrice(asset);
         const { change, changePct } = getLiveChange(asset);
-        const linkedPrice = calcLinkedPrice(asset);
-        const deviation = calcDeviation(asset);
-        const isHawkishPositive = asset.hawkishDirection === 1;
-        const priceColor = isHawkishPositive
-          ? (hawkScore > 0 ? '#EF5350' : '#00BFA5')
-          : (hawkScore > 0 ? '#00BFA5' : '#EF5350');
-        const isFlashing = flashAsset === asset.asset;
-        const deviationAbs = Math.abs(deviation);
-        const deviationPct = (deviationAbs / asset.basePrice) * 100;
         const isLive = !!(liveData?.[asset.asset]);
+        const isFlashing = flashAsset === asset.asset;
+
+        // 当前鹰鸽信号对该资产的方向
+        const signalBullish = (isHawkish && asset.hawkishDirection === 1) || (!isHawkish && asset.hawkishDirection === -1);
+        const signalColor = signalBullish ? '#EF5350' : '#00BFA5';
+        const signalLabel = signalBullish
+          ? (asset.hawkishDirection === 1 ? `↑ ${asset.hawkishImpact}` : `↑ 鸽派利好`)
+          : (asset.hawkishDirection === -1 ? `↓ ${asset.hawkishImpact}` : `↓ 鸽派承压`);
+
+        // 预期影响幅度：根据信号强度和敏感度计算
+        const impactMagnitude = (signalStrength / 10) * asset.sensitivity;
+        const impactBarWidth = Math.min(impactMagnitude * 12, 100);
 
         return (
           <motion.div
             key={asset.asset}
-            animate={isFlashing ? { scale: [1, 1.02, 1], opacity: [1, 0.7, 1] } : {}}
-            transition={{ duration: 0.4 }}
-            className="rounded-lg p-3 border border-white/6 bg-white/[0.02]"
+            animate={isFlashing ? { scale: [1, 1.015, 1] } : {}}
+            transition={{ duration: 0.3 }}
+            className="rounded-xl border bg-white/[0.02] overflow-hidden"
+            style={{ borderColor: `${signalColor}25` }}
           >
-            {/* 顶部：品种名 + 当前价 + 联动价 */}
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono-data text-sm font-bold text-white/85">{asset.asset}</span>
+            <div className="flex items-center gap-3 p-3">
+              {/* 左：品种名称 */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono-data text-sm font-bold text-white/90">{asset.asset}</span>
                   <span className="text-[10px] text-white/40">{asset.assetZh}</span>
+                  {/* 敏感度星级 */}
                   <div className="flex items-center gap-0.5">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className="w-1 h-1 rounded-full" style={{ background: i < asset.sensitivity ? '#E8B84B' : 'rgba(255,255,255,0.1)' }} />
+                      <div key={i} className="w-1 h-1 rounded-full" style={{ background: i < asset.sensitivity ? '#E8B84B80' : 'rgba(255,255,255,0.08)' }} />
                     ))}
                   </div>
                 </div>
-                <div className="text-[10px] text-white/35 mt-0.5">{asset.description}</div>
+                <div className="text-[10px] text-white/35 mt-0.5 leading-snug">{asset.logic}</div>
               </div>
-              <div className="text-right flex-shrink-0">
-                <div className="flex items-center gap-1 justify-end mb-0.5">
-                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isLive ? 'bg-[#00BFA5] live-dot' : 'bg-white/20'}`} />
-                  <div className="text-[10px] text-white/40">{isLive ? '实时价' : '参考价'}</div>
+
+              {/* 中：信号方向标签 */}
+              <div className="flex-shrink-0 text-center">
+                <motion.div
+                  key={`${asset.asset}-${hawkScore}`}
+                  initial={{ scale: 0.9, opacity: 0.5 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-sm font-bold px-2.5 py-1 rounded-lg"
+                  style={{
+                    color: signalColor,
+                    background: `${signalColor}15`,
+                    border: `1px solid ${signalColor}30`,
+                  }}
+                >
+                  {signalLabel}
+                </motion.div>
+                <div className="text-[9px] text-white/30 mt-1">{asset.impactPer10}</div>
+              </div>
+
+              {/* 右：实时价格 */}
+              <div className="text-right flex-shrink-0 min-w-[70px]">
+                <div className="flex items-center gap-1 justify-end">
+                  <div className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-[#00BFA5] live-dot' : 'bg-white/15'}`} />
+                  <span className="text-[9px] text-white/35">{isLive ? '实时' : '参考'}</span>
                 </div>
                 <motion.div
                   key={livePrice}
-                  initial={{ opacity: 0.6, y: -3 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="font-mono-data font-bold text-sm text-white/90 tabular-nums"
+                  initial={{ opacity: 0.6 }}
+                  animate={{ opacity: 1 }}
+                  className="font-mono-data font-bold text-base text-white/90 tabular-nums leading-tight"
                 >
                   {asset.unit}{livePrice.toFixed(asset.precision)}
                 </motion.div>
                 {isLive && (
                   <div className={`text-[10px] font-mono-data tabular-nums ${change >= 0 ? 'text-[#EF5350]' : 'text-[#00BFA5]'}`}>
-                    {change >= 0 ? '+' : ''}{change.toFixed(asset.precision)} ({changePct >= 0 ? '+' : ''}{changePct.toFixed(2)}%)
+                    {change >= 0 ? '+' : ''}{changePct.toFixed(2)}%
                   </div>
                 )}
               </div>
             </div>
 
-            {/* 联动价格展示 */}
-            <div className="grid grid-cols-3 gap-2">
-              {/* 基准价（中性） */}
-              <div className="bg-white/4 rounded-md p-2 text-center">
-                <div className="text-[9px] text-white/35 mb-0.5">中性基准</div>
-                <div className="font-mono-data text-xs text-white/50 tabular-nums">
-                  {asset.unit}{asset.basePrice.toFixed(asset.precision)}
-                </div>
+            {/* 底部：历史胜率 + 信号强度条 */}
+            <div className="px-3 pb-2.5 flex items-center gap-3">
+              <div className="flex items-center gap-3 text-[10px] text-white/35">
+                <span>鹰派周期历史月涂 <span className={asset.hawkishDirection === 1 ? 'text-[#EF5350]' : 'text-[#00BFA5]'} style={{ fontFamily: 'Space Mono' }}>{asset.hawkishMonthlyReturn}</span></span>
+                <span>胜率 <span className="text-[#E8B84B]" style={{ fontFamily: 'Space Mono' }}>{asset.hawkishWinRate}</span></span>
               </div>
-              {/* 联动价（基于当前鹰鸽指数） */}
-              <div className="rounded-md p-2 text-center" style={{ background: `${priceColor}12`, border: `1px solid ${priceColor}30` }}>
-                <div className="text-[9px] text-white/35 mb-0.5">联动估值</div>
-                <motion.div
-                  key={hawkScore}
-                  initial={{ scale: 1.1, opacity: 0.7 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                  className="font-mono-data text-xs font-bold tabular-nums"
-                  style={{ color: priceColor }}
-                >
-                  {asset.unit}{linkedPrice.toFixed(asset.precision)}
-                </motion.div>
-              </div>
-              {/* 偏离度（当前价 vs 联动价） */}
-              <div className="bg-white/4 rounded-md p-2 text-center">
-                <div className="text-[9px] text-white/35 mb-0.5">市场偏离</div>
-                <div className={`font-mono-data text-xs font-bold tabular-nums ${deviation > 0 ? 'text-[#EF5350]' : deviation < 0 ? 'text-[#00BFA5]' : 'text-white/40'}`}>
-                  {deviation > 0 ? '+' : ''}{deviation.toFixed(asset.precision)}
-                  <span className="text-[8px] ml-0.5 opacity-60">({deviationPct.toFixed(1)}%)</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 方向指示条 */}
-            <div className="mt-2 flex items-center gap-2">
               <div className="flex-1 h-1 rounded-full bg-white/5 overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
-                  style={{ background: priceColor, width: `${Math.min(Math.abs(hawkScore), 100)}%` }}
+                  style={{ background: `${signalColor}80` }}
                   initial={{ width: 0 }}
-                  animate={{ width: `${Math.min(Math.abs(hawkScore), 100)}%` }}
-                  transition={{ duration: 0.8 }}
+                  animate={{ width: `${impactBarWidth}%` }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
                 />
               </div>
-              <span className="text-[10px] font-mono-data flex-shrink-0" style={{ color: priceColor }}>
-                {isHawkishPositive ? (hawkScore > 0 ? '↑ 鹰派利好' : '↓ 鸽派利好') : (hawkScore > 0 ? '↓ 鹰派利空' : '↑ 鸽派利好')}
-              </span>
             </div>
           </motion.div>
         );
       })}
 
-      <div className="text-[10px] text-white/25 pt-1 leading-relaxed">
-        联动估值 = 中性基准 + 鹰鸽指数联动量 · 市场偏离 = 当前价 - 联动估值
+      <div className="text-[10px] text-white/20 pt-1 leading-relaxed">
+        历史胜率基于2015-2026年美联储鹰派周期统计 · 不构成投资建议
       </div>
     </div>
   );
