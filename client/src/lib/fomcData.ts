@@ -15,11 +15,16 @@ export interface FomcMember {
   stance: Stance;
   score: number; // -100 (极鸽) to +100 (极鹰)
   scoreChange: number; // vs last month
-  latestQuote: string;
+  latestQuoteZh: string; // 中文翻译
+  latestQuote: string;   // 英文原文
   quoteDate: string;
   initials: string;
   color: string;
+  photoUrl?: string; // 官方照片
 }
+
+// CDN存储路径
+const CDN = '/manus-storage';
 
 export const fomcMembers: FomcMember[] = [
   // DOVE
@@ -35,10 +40,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'dove',
     score: -60,
     scoreChange: -8,
+    latestQuoteZh: '我已将2026年底前的三次降息写入预测，希望以此支撑劳动力市场。',
     latestQuote: "I've written three cuts in for, before the end of 2026 to hopefully support the labor market.",
     quoteDate: '2026-03-20',
     initials: 'MB',
     color: '#00BFA5',
+    photoUrl: `${CDN}/bowman_8a0f0293.jpg`,
   },
   {
     id: 'miran',
@@ -52,10 +59,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'dove',
     score: -40,
     scoreChange: -5,
+    latestQuoteZh: '我可能预测三次降息，也可能是四次，我还没有下定决心。',
     latestQuote: "I might have three (rate cuts), I might have four, I haven't made up my mind.",
     quoteDate: '2026-04-16',
     initials: 'SM',
     color: '#00BFA5',
+    photoUrl: `${CDN}/miran_0f0dee1f.jpg`,
   },
   // DOVISH
   {
@@ -70,10 +79,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'dovish',
     score: -20,
     scoreChange: +3,
+    latestQuoteZh: '我的预测是核心通胀将继续向2%靠拢，这让我目前对降息持谨慎态度，但倾向于在今年晚些时候经济前景更明朗时降息以支持劳动力市场。',
     latestQuote: "I see a forecast in which underlying inflation would continue to move toward 2%, leaving me cautious about rate cuts now and more inclined toward cuts to support the labor market later this year.",
     quoteDate: '2026-04-17',
     initials: 'CW',
     color: '#4DB6AC',
+    photoUrl: `${CDN}/waller_468a1b10.jpg`,
   },
   {
     id: 'powell',
@@ -87,10 +98,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'dovish',
     score: -10,
     scoreChange: +2,
+    latestQuoteZh: '我们认为当前政策处于合适位置，可以静观其变，等待数据指引。',
     latestQuote: "We feel like our policy's in a good place for us to wait and see.",
     quoteDate: '2026-03-30',
     initials: 'JP',
     color: '#4DB6AC',
+    photoUrl: `${CDN}/powell_f43f6d59.jpg`,
   },
   // CENTRIST
   {
@@ -105,10 +118,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'centrist',
     score: 0,
     scoreChange: +5,
+    latestQuoteZh: '我认为政策已处于可根据数据随时调整的位置，我们随时准备对利率进行必要的调整。',
     latestQuote: "I think policy is positioned to adjust to the data as it's coming in, and we're prepared to make adjustments to the policy rate as needed.",
     quoteDate: '2026-04-02',
     initials: 'JW',
     color: '#9E9E9E',
+    photoUrl: `${CDN}/williams_b9b38aaf.jpg`,
   },
   {
     id: 'jefferson',
@@ -122,10 +137,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'centrist',
     score: +5,
     scoreChange: +8,
+    latestQuoteZh: '我的基准预期是利率将在较长时间内保持不变，但我确实认为利率面临双向风险。',
     latestQuote: "My baseline is that we're going to remain on hold for a good while, but I do think that there's two-sided risk to rates.",
     quoteDate: '2026-04-15',
     initials: 'PJ',
     color: '#9E9E9E',
+    photoUrl: `${CDN}/jefferson_0cc3923f.jpg`,
   },
   {
     id: 'paulson',
@@ -139,10 +156,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'centrist',
     score: +10,
     scoreChange: +4,
+    latestQuoteZh: '我认为在当前水平上维持政策一段时间可能是合适的。',
     latestQuote: "I think it's probably going to be appropriate to maintain policy at this level for some time.",
     quoteDate: '2026-04-15',
     initials: 'AP',
     color: '#9E9E9E',
+    photoUrl: undefined,
   },
   // HAWKISH
   {
@@ -157,10 +176,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'hawkish',
     score: +30,
     scoreChange: +12,
+    latestQuoteZh: '由于能源价格上涨，即便仅基于已有数据，未来几个月通胀率将远超3%。',
     latestQuote: "Because of the energy price increases, even based on what we've seen already, inflation will be well above 3% over the next few months.",
     quoteDate: '2026-04-16',
     initials: 'MD',
     color: '#EF5350',
+    photoUrl: `${CDN}/daly_50041a5b.jpg`,
   },
   {
     id: 'kashkari',
@@ -174,10 +195,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'hawkish',
     score: +35,
     scoreChange: +7,
+    latestQuoteZh: '我对前景持谨慎态度……但我认为当前政策立场是适当的。',
     latestQuote: "I remain cautious about my outlook.... I continue, however, to see our current policy stance as appropriately positioned.",
     quoteDate: '2026-04-07',
     initials: 'NK',
     color: '#EF5350',
+    photoUrl: `${CDN}/kashkari_d6fc9657.jpg`,
   },
   {
     id: 'goolsbee',
@@ -191,10 +214,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'hawkish',
     score: +25,
     scoreChange: +6,
+    latestQuoteZh: '燃油价格和化肥价格上涨向通胀传导的风险这次可能比以往更大。',
     latestQuote: "There's a little bit more of a risk that the transmission of higher fuel prices, higher fertilizer prices, into inflation is greater this time.",
     quoteDate: '2026-03-27',
     initials: 'AG',
     color: '#EF5350',
+    photoUrl: `${CDN}/goolsbee_6c23ef3a.jpg`,
   },
   {
     id: 'barkin',
@@ -208,10 +233,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'hawkish',
     score: +40,
     scoreChange: +10,
+    latestQuoteZh: '油价冲击发生之前我们就有工作要做；有了油价冲击，这项工作只会需要更长时间。',
     latestQuote: "We had work to do before we had the oil price shock; with the oil price shock, the work just takes longer.",
     quoteDate: '2026-04-10',
     initials: 'TB',
     color: '#EF5350',
+    photoUrl: undefined,
   },
   // HAWK
   {
@@ -226,10 +253,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'hawk',
     score: +55,
     scoreChange: +15,
+    latestQuoteZh: '我认为，由于伊朗战争，当前的通胀风险更大了。',
     latestQuote: "I would argue that the inflation risk is greater right now as a result of the Iran war.",
     quoteDate: '2026-03-26',
     initials: 'SC',
     color: '#C62828',
+    photoUrl: `${CDN}/collins_4c475c77.jpg`,
   },
   {
     id: 'musalem',
@@ -243,10 +272,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'hawk',
     score: +60,
     scoreChange: +18,
+    latestQuoteZh: '我尤其担忧，又一次价格冲击可能推高长期通胀预期。',
     latestQuote: "I am particularly concerned that yet another price shock could increase longer-term inflation expectations.",
     quoteDate: '2026-03-26',
     initials: 'AM',
     color: '#C62828',
+    photoUrl: undefined,
   },
   {
     id: 'logan',
@@ -260,10 +291,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'hawk',
     score: +65,
     scoreChange: +20,
+    latestQuoteZh: '我认为我们不能对通胀预期上升的风险掉以轻心。',
     latestQuote: "I don't think we can be complacent about the risks to inflation expectations.",
     quoteDate: '2026-03-31',
     initials: 'LL',
     color: '#C62828',
+    photoUrl: undefined,
   },
   {
     id: 'hammack',
@@ -277,10 +310,12 @@ export const fomcMembers: FomcMember[] = [
     stance: 'hawk',
     score: +70,
     scoreChange: +22,
+    latestQuoteZh: '我曾认为2026年可能有多次降息；但这种局面拖得越久，我就越倾向于认为我们将长期按兵不动。',
     latestQuote: "I thought there could be even multiple rate cuts in 2026; the longer this goes, where we never got to see the decrease in inflation, the more I'm thinking we're going to be on hold.",
     quoteDate: '2026-04-14',
     initials: 'BH',
     color: '#C62828',
+    photoUrl: `${CDN}/hammack_4f7eef90.jpg`,
   },
   {
     id: 'schmid',
@@ -294,16 +329,18 @@ export const fomcMembers: FomcMember[] = [
     stance: 'hawk',
     score: +75,
     scoreChange: +5,
+    latestQuoteZh: '自2026年3月6日以来未发表货币政策公开评论。',
     latestQuote: "No public comments on monetary policy since March 6, 2026.",
     quoteDate: '2026-03-06',
     initials: 'JS',
     color: '#C62828',
+    photoUrl: undefined,
   },
 ];
 
-// 整体鹰鸽指数（加权平均，投票委员权重更高）
-export const overallHawkishScore = 28; // 正值偏鹰
-export const overallHawkishScoreChange = +9; // 本月变化
+// 整体鹰鸽指数
+export const overallHawkishScore = 28;
+export const overallHawkishScoreChange = +9;
 
 // 鹰鸽分布统计
 export const stanceDistribution = {
@@ -325,7 +362,7 @@ export const policyRate = {
   fedMedianCuts2026: 1,
 };
 
-// 历史鹰鸽指数走势（过去12个月）
+// 历史鹰鸽指数走势
 export const hawkishHistory = [
   { month: '2025-05', score: -15, label: '5月' },
   { month: '2025-06', score: -20, label: '6月' },
@@ -341,157 +378,91 @@ export const hawkishHistory = [
   { month: '2026-04', score: +28, label: '4月' },
 ];
 
-// 重大经济数据预期差
-export interface EconData {
-  id: string;
-  name: string;
-  nameZh: string;
-  date: string;
-  actual: string;
-  forecast: string;
-  previous: string;
-  deviation: number; // 实际vs预期的偏差（标准差倍数）
-  impact: 'hawkish' | 'dovish' | 'neutral';
-  impactDesc: string;
-  goldImpact: string;
-  forexImpact: string;
-  category: 'labor' | 'inflation' | 'growth' | 'sentiment';
-}
+// ─── 动态资产联动数据 ──────────────────────────────────────────────────────────
+// 核心逻辑：鹰鸽指数每变化10点，资产价格按历史敏感度系数联动变化
+// 基准鹰鸽指数 = 0（中性），当前 = +28（偏鹰）
 
-export const recentEconData: EconData[] = [
-  {
-    id: 'nfp-apr',
-    name: 'Non Farm Payrolls',
-    nameZh: '非农就业人口',
-    date: '2026-05-08',
-    actual: '178K',
-    forecast: '73K',
-    previous: '60K',
-    deviation: +2.8,
-    impact: 'hawkish',
-    impactDesc: '大幅超预期，就业市场强劲，降息预期进一步推迟',
-    goldImpact: '黄金短线承压，历史上此类超预期幅度平均下跌 $18-25',
-    forexImpact: '美元指数短线走强，历史平均上涨 0.4-0.6%',
-    category: 'labor',
-  },
-  {
-    id: 'ism-mfg-prices',
-    name: 'ISM Manufacturing Prices',
-    nameZh: 'ISM制造业价格',
-    date: '2026-05-01',
-    actual: '84.6',
-    forecast: '80.0',
-    previous: '78.3',
-    deviation: +1.5,
-    impact: 'hawkish',
-    impactDesc: '价格指数飙升至84.6，油价冲击传导至制造业，通胀压力显著',
-    goldImpact: '通胀预期上升利好黄金，但美联储鹰派信号对冲，短线震荡',
-    forexImpact: '美元走强，通胀预期支撑实际利率',
-    category: 'inflation',
-  },
-  {
-    id: 'ism-mfg-pmi',
-    name: 'ISM Manufacturing PMI',
-    nameZh: 'ISM制造业PMI',
-    date: '2026-05-01',
-    actual: '52.7',
-    forecast: '53.0',
-    previous: '52.7',
-    deviation: -0.1,
-    impact: 'neutral',
-    impactDesc: '基本符合预期，制造业扩张维持，对货币政策影响有限',
-    goldImpact: '影响中性，黄金维持区间震荡',
-    forexImpact: '美元影响有限',
-    category: 'growth',
-  },
-  {
-    id: 'cpi-apr',
-    name: 'CPI YoY',
-    nameZh: 'CPI同比',
-    date: '2026-05-12',
-    actual: '3.3%',
-    forecast: '—',
-    previous: '3.5%',
-    deviation: 0,
-    impact: 'neutral',
-    impactDesc: '即将公布（5月12日），前值3.5%，市场预期3.3%',
-    goldImpact: '若低于3.0%，黄金短线可能上涨$20-30；若高于3.5%，黄金承压',
-    forexImpact: '若低于预期，美元走弱；若高于预期，美元走强',
-    category: 'inflation',
-  },
-  {
-    id: 'michigan-sentiment',
-    name: 'Michigan Consumer Sentiment',
-    nameZh: '密歇根消费者信心',
-    date: '2026-05-08',
-    actual: '49.8',
-    forecast: '50.0',
-    previous: '49.5',
-    deviation: -0.1,
-    impact: 'dovish',
-    impactDesc: '消费者信心持续低迷，接近历史低位，经济下行风险上升',
-    goldImpact: '避险情绪支撑黄金，历史上此类低迷信心环境黄金偏强',
-    forexImpact: '美元承压，避险日元走强',
-    category: 'sentiment',
-  },
-];
-
-// 资产联动分析
-export interface AssetImpact {
+export interface AssetLiveData {
   asset: string;
   assetZh: string;
-  currentPrice: string;
-  hawkishImpact: string;
-  dovishImpact: string;
-  sensitivity: number; // 1-5
-  currentBias: 'hawkish' | 'dovish' | 'neutral';
+  basePrice: number;       // 中性基准价格
+  currentPrice: number;    // 当前实际价格
+  unit: string;
+  // 每10点鹰鸽指数变化对应的价格变化（鹰派方向）
+  sensitivityPer10: number;
+  // 正值=鹰派利好，负值=鹰派利空
+  hawkishDirection: 1 | -1;
+  precision: number;       // 小数位数
+  sensitivity: number;     // 1-5 敏感度星级
+  description: string;     // 联动逻辑说明
+  color: string;
 }
 
-export const assetImpacts: AssetImpact[] = [
+export const assetLiveData: AssetLiveData[] = [
   {
     asset: 'XAU/USD',
     assetZh: '现货黄金',
-    currentPrice: '$3,247',
-    hawkishImpact: '↓ 利率上升压制无息资产，历史均值 -1.8%/月',
-    dovishImpact: '↑ 降息预期推升黄金，历史均值 +2.3%/月',
+    basePrice: 3350,
+    currentPrice: 3247,
+    unit: '$',
+    sensitivityPer10: -18,   // 鹰派每+10，黄金约-$18
+    hawkishDirection: -1,
+    precision: 0,
     sensitivity: 4,
-    currentBias: 'hawkish',
+    description: '利率上升压制无息资产，鹰派偏移每+10点约-$18',
+    color: '#E8B84B',
   },
   {
     asset: 'DXY',
     assetZh: '美元指数',
-    currentPrice: '102.4',
-    hawkishImpact: '↑ 利差扩大支撑美元，历史均值 +0.8%/月',
-    dovishImpact: '↓ 降息预期压制美元，历史均值 -1.1%/月',
+    basePrice: 100.2,
+    currentPrice: 102.4,
+    unit: '',
+    sensitivityPer10: +0.8,  // 鹰派每+10，美元约+0.8
+    hawkishDirection: 1,
+    precision: 1,
     sensitivity: 5,
-    currentBias: 'hawkish',
+    description: '利差扩大支撑美元，鹰派偏移每+10点约+0.8',
+    color: '#4DB6AC',
   },
   {
     asset: 'USD/JPY',
     assetZh: '美元/日元',
-    currentPrice: '148.2',
-    hawkishImpact: '↑ 美日利差扩大，日元走弱',
-    dovishImpact: '↓ 利差收窄，日元走强',
+    basePrice: 143.5,
+    currentPrice: 148.2,
+    unit: '¥',
+    sensitivityPer10: +1.7,  // 鹰派每+10，美日约+1.7
+    hawkishDirection: 1,
+    precision: 1,
     sensitivity: 5,
-    currentBias: 'hawkish',
+    description: '美日利差扩大，鹰派偏移每+10点约+1.7',
+    color: '#9E9E9E',
+  },
+  {
+    asset: 'US10Y',
+    assetZh: '10年期美债',
+    basePrice: 3.85,
+    currentPrice: 4.28,
+    unit: '%',
+    sensitivityPer10: +0.15, // 鹰派每+10，收益率约+0.15%
+    hawkishDirection: 1,
+    precision: 2,
+    sensitivity: 5,
+    description: '加息预期推升收益率，鹰派偏移每+10点约+0.15%',
+    color: '#EF5350',
   },
   {
     asset: 'XTI/USD',
     assetZh: '美国原油',
-    currentPrice: '$98.6',
-    hawkishImpact: '↓ 经济放缓预期压制需求',
-    dovishImpact: '↑ 宽松预期提振风险资产',
+    basePrice: 100.5,
+    currentPrice: 98.6,
+    unit: '$',
+    sensitivityPer10: -0.8,  // 鹰派每+10，原油约-$0.8（需求担忧）
+    hawkishDirection: -1,
+    precision: 1,
     sensitivity: 2,
-    currentBias: 'neutral',
-  },
-  {
-    asset: 'US10Y',
-    assetZh: '美国10年期国债',
-    currentPrice: '4.28%',
-    hawkishImpact: '↑ 加息预期推升收益率',
-    dovishImpact: '↓ 降息预期压低收益率',
-    sensitivity: 5,
-    currentBias: 'hawkish',
+    description: '经济放缓预期压制需求，鹰派偏移每+10点约-$0.8',
+    color: '#9E9E9E',
   },
 ];
 
