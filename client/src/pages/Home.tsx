@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { trpc } from '@/lib/trpc';
 import {
   fomcMembers,
   overallHawkishScore,
@@ -223,14 +224,19 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 // ─── Dynamic Asset Panel ──────────────────────────────────────────────────────
-// 核心：根据当前鹰鸽指数，动态计算各资产的"联动价格"和"偏离基准"
+// 核心：接入真实行情 + 根据鹰鸽指数动态计算联动估值
 function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
   const [prevScore, setPrevScore] = useState(hawkScore);
   const [flashAsset, setFlashAsset] = useState<string | null>(null);
 
+  // 接入真实行情，每60秒刷新一次
+  const { data: liveData, isLoading: pricesLoading } = trpc.market.prices.useQuery(
+    undefined,
+    { refetchInterval: 60_000, staleTime: 30_000 }
+  );
+
   useEffect(() => {
     if (hawkScore !== prevScore) {
-      // 找出变化最大的资产并闪烁
       const maxSensAsset = assetLiveData.reduce((a, b) => a.sensitivity > b.sensitivity ? a : b);
       setFlashAsset(maxSensAsset.asset);
       setTimeout(() => setFlashAsset(null), 1500);
@@ -244,15 +250,35 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
     return asset.basePrice + delta;
   };
 
-  // 计算当前价格偏离联动价格的幅度（显示市场是否已经price in）
+  // 获取真实当前价（优先用API数据，fallback用静态数据）
+  const getLivePrice = (asset: AssetLiveData): number => {
+    const live = liveData?.[asset.asset];
+    return live?.price ?? asset.currentPrice;
+  };
+
+  const getLiveChange = (asset: AssetLiveData): { change: number; changePct: number } => {
+    const live = liveData?.[asset.asset];
+    return { change: live?.change ?? 0, changePct: live?.changePct ?? 0 };
+  };
+
+  // 计算当前价格偏离联动价格的幅度
   const calcDeviation = (asset: AssetLiveData) => {
     const linked = calcLinkedPrice(asset);
-    return asset.currentPrice - linked;
+    const current = getLivePrice(asset);
+    return current - linked;
   };
 
   return (
     <div className="space-y-2.5">
+      {pricesLoading && (
+        <div className="text-center text-white/30 text-xs py-3 flex items-center justify-center gap-2">
+          <div className="w-3 h-3 border border-[#E8B84B]/40 border-t-[#E8B84B] rounded-full animate-spin" />
+          正在获取实时行情…
+        </div>
+      )}
       {assetLiveData.map((asset) => {
+        const livePrice = getLivePrice(asset);
+        const { change, changePct } = getLiveChange(asset);
         const linkedPrice = calcLinkedPrice(asset);
         const deviation = calcDeviation(asset);
         const isHawkishPositive = asset.hawkishDirection === 1;
@@ -262,6 +288,7 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
         const isFlashing = flashAsset === asset.asset;
         const deviationAbs = Math.abs(deviation);
         const deviationPct = (deviationAbs / asset.basePrice) * 100;
+        const isLive = !!(liveData?.[asset.asset]);
 
         return (
           <motion.div
@@ -285,10 +312,23 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
                 <div className="text-[10px] text-white/35 mt-0.5">{asset.description}</div>
               </div>
               <div className="text-right flex-shrink-0">
-                <div className="text-[10px] text-white/40">当前价</div>
-                <div className="font-mono-data font-bold text-sm text-white/80 tabular-nums">
-                  {asset.unit}{asset.currentPrice.toFixed(asset.precision)}
+                <div className="flex items-center gap-1 justify-end mb-0.5">
+                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isLive ? 'bg-[#00BFA5] live-dot' : 'bg-white/20'}`} />
+                  <div className="text-[10px] text-white/40">{isLive ? '实时价' : '参考价'}</div>
                 </div>
+                <motion.div
+                  key={livePrice}
+                  initial={{ opacity: 0.6, y: -3 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="font-mono-data font-bold text-sm text-white/90 tabular-nums"
+                >
+                  {asset.unit}{livePrice.toFixed(asset.precision)}
+                </motion.div>
+                {isLive && (
+                  <div className={`text-[10px] font-mono-data tabular-nums ${change >= 0 ? 'text-[#EF5350]' : 'text-[#00BFA5]'}`}>
+                    {change >= 0 ? '+' : ''}{change.toFixed(asset.precision)} ({changePct >= 0 ? '+' : ''}{changePct.toFixed(2)}%)
+                  </div>
+                )}
               </div>
             </div>
 

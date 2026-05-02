@@ -452,8 +452,8 @@ export const assetLiveData: AssetLiveData[] = [
     color: '#EF5350',
   },
   {
-    asset: 'XTI/USD',
-    assetZh: '美国原油',
+    asset: 'WTI/USD',
+    assetZh: 'WTI原油',
     basePrice: 100.5,
     currentPrice: 98.6,
     unit: '$',
