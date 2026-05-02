@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
 import {
@@ -287,7 +288,7 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
             className="rounded-xl border bg-white/[0.02] overflow-hidden"
             style={{ borderColor: `${signalColor}25` }}
           >
-            <div className="flex items-center gap-3 p-3">
+            <div className="flex items-center gap-2 sm:gap-3 p-3">
               {/* 左：品种名称 */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -310,7 +311,7 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
                   initial={{ scale: 0.9, opacity: 0.5 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.3 }}
-                  className="text-sm font-bold px-2.5 py-1 rounded-lg"
+                  className="text-xs sm:text-sm font-bold px-2 sm:px-2.5 py-1 rounded-lg whitespace-nowrap"
                   style={{
                     color: signalColor,
                     background: `${signalColor}15`,
@@ -319,11 +320,11 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
                 >
                   {signalLabel}
                 </motion.div>
-                <div className="text-[9px] text-white/30 mt-1">{asset.impactPer10}</div>
+                <div className="text-[9px] text-white/30 mt-1 whitespace-nowrap">{asset.impactPer10}</div>
               </div>
 
               {/* 右：实时价格 */}
-              <div className="text-right flex-shrink-0 min-w-[70px]">
+              <div className="text-right flex-shrink-0 min-w-[60px] sm:min-w-[70px]">
                 <div className="flex items-center gap-1 justify-end">
                   <div className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-[#00BFA5] live-dot' : 'bg-white/15'}`} />
                   <span className="text-[9px] text-white/35">{isLive ? '实时' : '参考'}</span>
@@ -345,8 +346,8 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
             </div>
 
             {/* 底部：历史胜率 + 信号强度条 */}
-            <div className="px-3 pb-2.5 flex items-center gap-3">
-              <div className="flex items-center gap-3 text-[10px] text-white/35">
+            <div className="px-3 pb-2.5 flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 text-[10px] text-white/35 flex-wrap">
                 <span>鹰派周期历史月均涨跌 <span className={asset.hawkishDirection === 1 ? 'text-[#EF5350]' : 'text-[#00BFA5]'} style={{ fontFamily: 'Space Mono' }}>{asset.hawkishMonthlyReturn}</span></span>
                 <span>历史同向 <span className="text-white/50" style={{ fontFamily: 'Space Mono' }}>{asset.hawkishWinRate}</span></span>
               </div>
@@ -453,19 +454,67 @@ export default function Home() {
           {/* Key Metrics */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-6">
             {[
-              { label: '综合鹰鸽指数', valueNum: demoScore, prefix: demoScore > 0 ? '+' : '', suffix: '', color: overallColor, sub: overallLabel, change: overallHawkishScoreChange },
-              { label: '当前政策利率', valueStr: policyRate.current, color: '#E8B84B', sub: '目标区间', change: null },
-              { label: '鹰派票委', valueNum: stanceDistribution.hawk + stanceDistribution.hawkish, prefix: '', suffix: '人', color: '#EF5350', sub: `共${fomcMembers.length}位成员`, change: null },
-              { label: '下次会议', valueStr: '6月17日', color: '#9E9E9E', sub: '预期维持不变', change: null },
+              { label: '综合鹰鸽指数', valueNum: demoScore, prefix: demoScore > 0 ? '+' : '', suffix: '', color: overallColor, sub: overallLabel, change: overallHawkishScoreChange, showInfo: true },
+              { label: '当前政策利率', valueStr: policyRate.current, color: '#E8B84B', sub: '目标区间', change: null, showInfo: false },
+              { label: '鹰派票委', valueNum: stanceDistribution.hawk + stanceDistribution.hawkish, prefix: '', suffix: '人', color: '#EF5350', sub: `共${fomcMembers.length}位成员`, change: null, showInfo: false },
+              { label: '下次会议', valueStr: '6月17日', color: '#9E9E9E', sub: '预期维持不变', change: null, showInfo: false },
             ].map((m, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * i + 0.3 }}
-                className="card-gold-glow rounded-xl p-3 sm:p-4"
+                className="card-gold-glow rounded-xl p-3 sm:p-4 relative"
               >
-                <div className="text-white/40 text-[11px] mb-1.5 leading-tight">{m.label}</div>
+                {/* 算法说明角标 */}
+                {m.showInfo && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button
+                        className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold transition-all hover:scale-110"
+                        style={{ background: 'rgba(232,184,75,0.2)', color: '#E8B84B', border: '1px solid rgba(232,184,75,0.4)' }}
+                        title="查看算法说明"
+                      >
+                        ?
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-sm" style={{ background: '#161B27', border: '1px solid rgba(232,184,75,0.2)', color: 'white' }}>
+                      <DialogHeader>
+                        <DialogTitle style={{ color: '#E8B84B' }}>📊 综合鹰鸽指数 — 算法说明</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-3 text-sm text-white/70 leading-relaxed">
+                        <p>综合鹰鸽指数范围为 <span className="text-white font-semibold">-100（极鸽）到 +100（极鹰）</span>，由以下三个维度加权计算：</p>
+                        <div className="space-y-2">
+                          <div className="flex items-start gap-2">
+                            <span className="text-[#E8B84B] font-bold flex-shrink-0">40%</span>
+                            <div>
+                              <div className="text-white/90 font-medium">官方讲话语义分析</div>
+                              <div className="text-white/50 text-xs mt-0.5">对各位官员公开讲话进行NLP语义分析，提取鹰鸽倒向关键词（如“通谀黏性”、“需要耐心”、“降息空间”），评分范围为-10到+10</div>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="text-[#E8B84B] font-bold flex-shrink-0">35%</span>
+                            <div>
+                              <div className="text-white/90 font-medium">立场变化跟踪</div>
+                              <div className="text-white/50 text-xs mt-0.5">跟踪每位官员与上次讲话相比的立场偏移幅度，投票委员权重为非投票官员的两倍</div>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="text-[#E8B84B] font-bold flex-shrink-0">25%</span>
+                            <div>
+                              <div className="text-white/90 font-medium">市场隐含预期</div>
+                              <div className="text-white/50 text-xs mt-0.5">参考CME FedWatch工具的降息概率变化，将市场对鹰鸽的实时定价纳入评分</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pt-2 border-t border-white/10 text-[11px] text-white/40">
+                          注：当前Demo中的评分为专家手动标注，正式上线后将由AI自动实时计算更新
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+                <div className="text-white/40 text-[11px] mb-1.5 leading-tight pr-5">{m.label}</div>
                 <div className="font-mono-data font-bold leading-none" style={{ color: m.color, fontSize: 'clamp(1.25rem, 4vw, 1.75rem)' }}>
                   {'valueNum' in m ? (
                     <>{m.prefix}<AnimatedNumber value={m.valueNum!} />{m.suffix}</>
@@ -604,7 +653,7 @@ export default function Home() {
         </div>
 
         {/* ── Row 2: Member List + Detail ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-start">
 
           {/* Member List */}
           <motion.div
@@ -641,7 +690,7 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="space-y-1.5 max-h-[500px] overflow-y-auto pr-0.5">
+            <div className="space-y-1.5 max-h-[400px] sm:max-h-[500px] overflow-y-auto pr-0.5">
               <AnimatePresence mode="popLayout">
                 {filteredMembers.map((member, i) => (
                   <motion.div
@@ -659,7 +708,7 @@ export default function Home() {
           </motion.div>
 
           {/* Detail Panel */}
-          <div className="lg:col-span-2 space-y-4" ref={detailRef}>
+          <div className="lg:col-span-2 space-y-4 order-first lg:order-none" ref={detailRef}>
             <AnimatePresence mode="wait">
               {selectedMember ? (
                 <motion.div
@@ -767,8 +816,8 @@ export default function Home() {
 
           {/* 鹰鸽指数滑块（Demo交互：拖动查看联动效果） */}
           <div className="mb-4 p-3 rounded-lg bg-white/3 border border-white/6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-white/50">🎛️ 拖动模拟鹰鸽指数变化，观察资产联动</span>
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <span className="text-xs text-white/50 leading-snug">🎛️ 拖动模拟鹰鸽指数变化，观察资产联动</span>
               <span className="font-mono-data text-sm font-bold tabular-nums" style={{ color: overallColor }}>
                 {demoScore > 0 ? '+' : ''}{demoScore}
               </span>

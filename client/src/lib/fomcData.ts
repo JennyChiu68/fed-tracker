@@ -402,6 +402,8 @@ export interface AssetLiveData {
   hawkishWinRate: string;
   // 逻辑说明（一句话）
   logic: string;
+  // 回测说明
+  backtestNote?: string;
 }
 
 export const assetLiveData: AssetLiveData[] = [
@@ -416,9 +418,10 @@ export const assetLiveData: AssetLiveData[] = [
     hawkishDirection: -1,
     hawkishImpact: '承压',
     impactPer10: '每+10点约-$18',
-    hawkishMonthlyReturn: '-1.8%',
-    hawkishWinRate: '72%',
-    logic: '利率上升压制无息资产，黄金对利率预期极敏感',
+    hawkishMonthlyReturn: '+0.2%',
+    hawkishWinRate: '50%',
+    logic: '利率上升理论上压制无息资产，但月度数据显示相关性较弱',
+    backtestNote: '回测44个月，同向50%，说明短期黄金受多重因素影响',
   },
   {
     asset: 'DXY',
@@ -431,9 +434,10 @@ export const assetLiveData: AssetLiveData[] = [
     hawkishDirection: 1,
     hawkishImpact: '强势',
     impactPer10: '每+10点约+0.8',
-    hawkishMonthlyReturn: '+0.8%',
-    hawkishWinRate: '78%',
-    logic: '利差扩大吸引资金回流，美元指数最直接受益',
+    hawkishMonthlyReturn: '+0.1%',
+    hawkishWinRate: '51%',
+    logic: '利差扩大支撑美元，但月度同向性有限，中长期趋势更显著',
+    backtestNote: '回测53个月，同向51%，美元对鹰派的反应更多体现在趋势而非单月',
   },
   {
     asset: 'USD/JPY',
@@ -446,9 +450,10 @@ export const assetLiveData: AssetLiveData[] = [
     hawkishDirection: 1,
     hawkishImpact: '日元承压',
     impactPer10: '每+10点约+1.7',
-    hawkishMonthlyReturn: '+1.1%',
-    hawkishWinRate: '75%',
-    logic: '美日利差扩大，日元持续承压走弱',
+    hawkishMonthlyReturn: '+0.4%',
+    hawkishWinRate: '52%',
+    logic: '美日利差扩大，日元趋势性走弱，但单月波动较大',
+    backtestNote: '回测54个月，同向52%，利差扩大在中期维度更为显著',
   },
   {
     asset: 'US10Y',
@@ -461,9 +466,10 @@ export const assetLiveData: AssetLiveData[] = [
     hawkishDirection: 1,
     hawkishImpact: '收益率上行',
     impactPer10: '每+10点约+0.15%',
-    hawkishMonthlyReturn: '+0.12%',
-    hawkishWinRate: '81%',
-    logic: '加息预期直接推升长端傘收益率',
+    hawkishMonthlyReturn: '+2.9%',
+    hawkishWinRate: '60%',
+    logic: '加息预期直接推升长端美债收益率，是五个品种中相关性最强的',
+    backtestNote: '回测48个月，同向60%，为五品种最高，与货币政策逻辑最直接',
   },
   {
     asset: 'WTI/USD',
@@ -476,9 +482,10 @@ export const assetLiveData: AssetLiveData[] = [
     hawkishDirection: -1,
     hawkishImpact: '需求承压',
     impactPer10: '每+10点约-$0.8',
-    hawkishMonthlyReturn: '-0.5%',
-    hawkishWinRate: '58%',
-    logic: '经济放缓预期压制需求，但地缘因素对冲弱',
+    hawkishMonthlyReturn: '+1.5%',
+    hawkishWinRate: '48%',
+    logic: '鹰派周期内原油受地缘供给影响更大，与货币政策相关性最弱',
+    backtestNote: '回测44个月，同向48%，低于随机水平，地缘因素主导油价',
   },
 ];
 
