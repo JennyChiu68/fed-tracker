@@ -45,7 +45,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-03-20',
     initials: 'MB',
     color: '#00BFA5',
-    photoUrl: `${CDN}/bowman_8a0f0293.jpg`,
+    photoUrl: `${CDN}/bowman_3a7c847d.jpg`,
   },
   {
     id: 'miran',
@@ -64,7 +64,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-04-16',
     initials: 'SM',
     color: '#00BFA5',
-    photoUrl: `${CDN}/miran_0f0dee1f.jpg`,
+    photoUrl: `${CDN}/miran_a83f2d9d.jpg`,
   },
   // DOVISH
   {
@@ -84,7 +84,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-04-17',
     initials: 'CW',
     color: '#4DB6AC',
-    photoUrl: `${CDN}/waller_468a1b10.jpg`,
+    photoUrl: `${CDN}/waller_c0894e92.jpg`,
   },
   {
     id: 'powell',
@@ -142,7 +142,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-04-15',
     initials: 'PJ',
     color: '#9E9E9E',
-    photoUrl: `${CDN}/jefferson_0cc3923f.jpg`,
+    photoUrl: `${CDN}/jefferson_0e19dbc6.jpg`,
   },
   {
     id: 'paulson',
@@ -161,7 +161,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-04-15',
     initials: 'AP',
     color: '#9E9E9E',
-    photoUrl: `${CDN}/paulson_6aac10cf.jpg`,
+    photoUrl: `${CDN}/paulson_f9c348c4.jpg`,
   },
   // HAWKISH
   {
