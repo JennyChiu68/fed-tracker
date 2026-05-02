@@ -130,17 +130,19 @@ function ScoreBar({ score }: { score: number }) {
 // ─── Member Card ──────────────────────────────────────────────────────────────
 function MemberCard({ member, onClick, isSelected }: { member: FomcMember; onClick: () => void; isSelected: boolean }) {
   return (
-    <motion.div
-      layout
-      whileHover={{ y: -1 }}
-      onClick={onClick}
-      className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+    <div
+      className={`rounded-xl overflow-hidden transition-all duration-200 ${
         isSelected
-          ? 'border border-[#E8B84B]/40 bg-[#E8B84B]/5'
-          : 'border border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]'
+          ? 'border border-[#E8B84B]/35'
+          : 'border border-white/5 hover:border-white/10'
       }`}
+      style={isSelected
+        ? { background: 'linear-gradient(135deg, rgba(26,31,46,0.98) 0%, rgba(20,24,38,0.98) 100%)', boxShadow: `0 0 16px ${member.color}12` }
+        : { background: 'rgba(255,255,255,0.02)' }
+      }
     >
-      <div className="flex items-center gap-3">
+      {/* 头部行 */}
+      <div className="flex items-center gap-3 p-3 cursor-pointer" onClick={onClick}>
         <MemberAvatar member={member} size="md" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -149,7 +151,7 @@ function MemberCard({ member, onClick, isSelected }: { member: FomcMember; onCli
               <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#E8B84B]/15 text-[#E8B84B] border border-[#E8B84B]/20 whitespace-nowrap">永久票委</span>
             )}
             {member.isCurrentVoter && !member.isPermanentVoter && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/8 text-white/50 border border-white/10 whitespace-nowrap">轮值票委</span>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/8 text-white/50 border border-white/10 whitespace-nowrap">轮値票委</span>
             )}
           </div>
           <div className="text-white/40 text-xs mt-0.5 truncate">{member.titleZh}</div>
@@ -163,11 +165,71 @@ function MemberCard({ member, onClick, isSelected }: { member: FomcMember; onCli
             </span>
           </div>
         </div>
-        <div className="w-16 flex-shrink-0">
-          <ScoreBar score={member.score} />
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="w-12 hidden sm:block">
+            <ScoreBar score={member.score} />
+          </div>
+          <motion.span
+            animate={{ rotate: isSelected ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-white/30 text-xs w-4 text-center"
+          >▼</motion.span>
         </div>
       </div>
-    </motion.div>
+
+      {/* 内联展开详情 */}
+      <AnimatePresence>
+        {isSelected && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="overflow-hidden"
+          >
+            <div className="px-3 pb-3 pt-2 border-t border-white/8 space-y-3">
+              {/* 评分三栏 */}
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: '鹰鸽评分', value: `${member.score > 0 ? '+' : ''}${member.score}`, color: member.color },
+                  { label: '月度变化', value: `${member.scoreChange > 0 ? '+' : ''}${member.scoreChange}`, color: member.scoreChange > 0 ? '#EF5350' : '#00BFA5' },
+                  { label: '投票权', value: member.isPermanentVoter ? '永久' : member.isCurrentVoter ? '轮値' : '无', color: member.isPermanentVoter ? '#E8B84B' : member.isCurrentVoter ? '#9E9E9E' : '#555' },
+                ].map(s => (
+                  <div key={s.label} className="bg-white/4 rounded-lg p-2 text-center">
+                    <div className="text-white/40 text-[10px] mb-0.5">{s.label}</div>
+                    <div className="font-mono-data font-bold text-base tabular-nums" style={{ color: s.color }}>{s.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 光谱条 */}
+              <div>
+                <div className="flex justify-between text-[10px] text-white/25 mb-1">
+                  <span>极鸽 -100</span>
+                  <span>+100 极鹰</span>
+                </div>
+                <div className="relative h-2.5 rounded-full overflow-hidden" style={{ background: 'linear-gradient(to right, #00BFA5, #4DB6AC, #6B7280, #EF5350, #C62828)' }}>
+                  <motion.div
+                    className="absolute top-0 h-full w-0.5 bg-white rounded-full"
+                    initial={{ left: '50%' }}
+                    animate={{ left: `${((member.score + 100) / 200) * 100}%` }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    style={{ transform: 'translateX(-50%)' }}
+                  />
+                </div>
+              </div>
+
+              {/* 最新表态 */}
+              <div className="rounded-lg p-2.5" style={{ background: `${member.color}08`, border: `1px solid ${member.color}20` }}>
+                <div className="text-[10px] text-white/40 mb-1.5">💬 最新表态 · {member.quoteDate}</div>
+                <p className="text-sm text-white/85 leading-relaxed font-medium">{member.latestQuoteZh}</p>
+                <p className="text-[10px] text-white/30 leading-relaxed mt-2 italic border-t border-white/5 pt-2">原文：“{member.latestQuote}”</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -652,21 +714,18 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* ── Row 2: Member List + Detail ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-start">
+        {/* ── Row 2: Member List （手风琴内联展开）── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+          className="card-gold-glow rounded-xl p-4 sm:p-5"
+        >
+          <div className="mb-4">
+            <h2 className="text-white/90 font-semibold text-sm">票委立场详情</h2>
+            <p className="text-white/40 text-xs mt-0.5">点击任意委员展开详情，再次点击收起</p>
+          </div>
 
-          {/* Member List */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
-            className="lg:col-span-3 card-gold-glow rounded-xl p-4 sm:p-5"
-          >
-            <div className="mb-4">
-              <h2 className="text-white/90 font-semibold text-sm">票委立场详情</h2>
-              <p className="text-white/40 text-xs mt-0.5">点击任意委员查看官方照片与最新讲话</p>
-            </div>
-
-            {/* Filter tabs */}
-            <div className="flex gap-1.5 flex-wrap mb-4">
+          {/* Filter tabs */}
+          <div className="flex gap-1.5 flex-wrap mb-4">
               {[
                 { key: 'all', label: `全部 (${fomcMembers.length})` },
                 { key: 'voter', label: `投票委员 (${fomcMembers.filter(m => m.isCurrentVoter).length})` },
@@ -690,113 +749,19 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="space-y-1.5 max-h-[400px] sm:max-h-[500px] overflow-y-auto pr-0.5">
-              <AnimatePresence mode="popLayout">
-                {filteredMembers.map((member, i) => (
-                  <motion.div
-                    key={member.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.97 }}
-                    transition={{ delay: i * 0.03 }}
-                  >
-                    <MemberCard member={member} onClick={() => handleMemberClick(member)} isSelected={selectedMember?.id === member.id} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+            <div className="space-y-1.5">
+              {filteredMembers.map((member, i) => (
+                <motion.div
+                  key={member.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.02 }}
+                >
+                  <MemberCard member={member} onClick={() => handleMemberClick(member)} isSelected={selectedMember?.id === member.id} />
+                </motion.div>
+              ))}
             </div>
-          </motion.div>
-
-          {/* Detail Panel */}
-          <div className="lg:col-span-2 space-y-4 order-first lg:order-none" ref={detailRef}>
-            <AnimatePresence mode="wait">
-              {selectedMember ? (
-                <motion.div
-                  key={selectedMember.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="rounded-xl p-4 sm:p-5 space-y-4"
-                  style={{
-                    border: `1px solid ${selectedMember.color}30`,
-                    background: 'linear-gradient(135deg, rgba(26,31,46,0.95) 0%, rgba(20,24,38,0.95) 100%)',
-                    boxShadow: `0 0 30px ${selectedMember.color}12`,
-                  }}
-                >
-                  {/* Header with official photo */}
-                  <div className="flex items-start gap-3">
-                    <MemberAvatar member={selectedMember} size="lg" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-white font-bold text-base leading-tight">{selectedMember.nameZh}</h3>
-                        <StanceBadge stance={selectedMember.stance} />
-                      </div>
-                      <div className="text-white/40 text-xs mt-0.5 truncate">{selectedMember.name}</div>
-                      <div className="text-white/50 text-xs truncate">{selectedMember.titleZh}</div>
-                    </div>
-                  </div>
-
-                  {/* Score grid */}
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { label: '鹰鸽评分', value: `${selectedMember.score > 0 ? '+' : ''}${selectedMember.score}`, color: selectedMember.color },
-                      { label: '月度变化', value: `${selectedMember.scoreChange > 0 ? '+' : ''}${selectedMember.scoreChange}`, color: selectedMember.scoreChange > 0 ? '#EF5350' : '#00BFA5' },
-                      { label: '投票权', value: selectedMember.isPermanentVoter ? '永久' : selectedMember.isCurrentVoter ? '轮值' : '无', color: selectedMember.isPermanentVoter ? '#E8B84B' : selectedMember.isCurrentVoter ? '#9E9E9E' : '#555' },
-                    ].map(s => (
-                      <div key={s.label} className="bg-white/4 rounded-lg p-2.5 text-center">
-                        <div className="text-white/40 text-[10px] mb-1">{s.label}</div>
-                        <div className="font-mono-data font-bold text-lg tabular-nums" style={{ color: s.color }}>{s.value}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Spectrum indicator */}
-                  <div>
-                    <div className="flex justify-between text-[10px] text-white/25 mb-1.5">
-                      <span>极鸽 -100</span>
-                      <span>+100 极鹰</span>
-                    </div>
-                    <div className="relative h-3 rounded-full overflow-hidden" style={{ background: 'linear-gradient(to right, #00BFA5, #4DB6AC, #6B7280, #EF5350, #C62828)' }}>
-                      <motion.div
-                        className="absolute top-0 h-full w-0.5 bg-white rounded-full shadow-lg"
-                        initial={{ left: '50%' }}
-                        animate={{ left: `${((selectedMember.score + 100) / 200) * 100}%` }}
-                        transition={{ duration: 0.8, ease: 'easeOut' }}
-                        style={{ transform: 'translateX(-50%)' }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Chinese quote */}
-                  <div className="rounded-lg p-3" style={{ background: `${selectedMember.color}08`, border: `1px solid ${selectedMember.color}20` }}>
-                    <div className="text-[10px] text-white/40 mb-1.5">💬 最新表态 · {selectedMember.quoteDate}</div>
-                    <p className="text-sm text-white/85 leading-relaxed font-medium">
-                      {selectedMember.latestQuoteZh}
-                    </p>
-                    <p className="text-[10px] text-white/30 leading-relaxed mt-2 italic border-t border-white/5 pt-2">
-                      原文："{selectedMember.latestQuote}"
-                    </p>
-                  </div>
-
-                  <button onClick={() => setSelectedMember(null)} className="w-full text-xs text-white/25 hover:text-white/45 transition-colors py-1">
-                    收起 ↑
-                  </button>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  className="card-gold-glow rounded-xl p-6 flex flex-col items-center justify-center text-center min-h-[160px]"
-                >
-                  <div className="text-3xl mb-2">🦅</div>
-                  <div className="text-white/50 text-sm">点击左侧委员</div>
-                  <div className="text-white/30 text-xs mt-1">查看官方照片与最新表态（中文）</div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
+        </motion.div>
 
         {/* ── Row 3: Dynamic Asset Linkage ── */}
         <motion.div
