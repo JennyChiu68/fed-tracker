@@ -353,7 +353,9 @@ function DynamicAssetPanel({ hawkScore }: { hawkScore: number }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function Home() {
-  const [selectedMember, setSelectedMember] = useState<FomcMember | null>(null);
+  const [selectedMember, setSelectedMember] = useState<FomcMember | null>(
+    fomcMembers.find(m => m.id === 'powell') ?? fomcMembers[0]
+  );
   const [activeFilter, setActiveFilter] = useState<Stance | 'all' | 'voter'>('all');
   const [currentTime, setCurrentTime] = useState(new Date());
   // 模拟鹰鸽指数可以被用户调整（用于演示联动效果）
@@ -372,7 +374,7 @@ export default function Home() {
   });
 
   const handleMemberClick = (member: FomcMember) => {
-    setSelectedMember(prev => prev?.id === member.id ? null : member);
+    setSelectedMember(prev => (prev && prev.id === member.id) ? null : member);
     setTimeout(() => detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
   };
 

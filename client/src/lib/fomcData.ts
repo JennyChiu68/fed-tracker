@@ -161,7 +161,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-04-15',
     initials: 'AP',
     color: '#9E9E9E',
-    photoUrl: undefined,
+    photoUrl: `${CDN}/paulson_6aac10cf.jpg`,
   },
   // HAWKISH
   {
@@ -238,7 +238,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-04-10',
     initials: 'TB',
     color: '#EF5350',
-    photoUrl: undefined,
+    photoUrl: `${CDN}/barkin_8f86535b.jpg`,
   },
   // HAWK
   {
@@ -277,7 +277,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-03-26',
     initials: 'AM',
     color: '#C62828',
-    photoUrl: undefined,
+    photoUrl: `${CDN}/musalem_8d277b5d.jpg`,
   },
   {
     id: 'logan',
@@ -296,7 +296,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-03-31',
     initials: 'LL',
     color: '#C62828',
-    photoUrl: undefined,
+    photoUrl: `${CDN}/logan_b224e4e2.jpg`,
   },
   {
     id: 'hammack',
@@ -334,7 +334,7 @@ export const fomcMembers: FomcMember[] = [
     quoteDate: '2026-03-06',
     initials: 'JS',
     color: '#C62828',
-    photoUrl: undefined,
+    photoUrl: `${CDN}/schmid_cfa91798.jpg`,
   },
 ];
 
